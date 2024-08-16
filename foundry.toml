@@ -68,6 +68,10 @@ prague = false
 isolate = false
 
 [[profile.default.fs_permissions]]
+access = "read-write"
+path = "./"
+
+[[profile.default.fs_permissions]]
 access = "read"
 path = "out"
 
