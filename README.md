@@ -10,7 +10,7 @@ BevmStack Bridge is implemented using [UUPS proxy pattern](https://docs.openzepp
 - `openzeppelin-foundry-upgrades`: `v0.3.2`
 - `openzeppelin-contracts-upgradeable`: `v5.0.2`
 
-## 2. Env
+## 2. Envs
 
 reset PRIVATE_KEY
 
