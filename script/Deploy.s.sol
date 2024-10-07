@@ -46,7 +46,7 @@ contract DeployScript is Script {
             initialParameters.gasDecimalsOnBitcoin = 8;
             initialParameters.gasType = "btc";
             initialParameters.cold = 0x3FA60E476834068Ee20Ecfb0087DfE541DAf8840;
-            initialParameters.owner = 0xB45cf380FF9A33c2bf7c41043530dc8Bb2e5295B;
+            initialParameters.owner = 0x1111111111111111111111111111111111111111;
 
             initialParameters.gasFactorMul = 1;
             initialParameters.gasFactorDiv = 1;
