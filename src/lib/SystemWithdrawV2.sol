@@ -27,7 +27,7 @@ library SystemWithdraw {
         require(normalizedValue > 0, "Normalized gas is zero");
 
         (bool success, bytes memory returnData) = precompile().call(
-            abi.encodeWithSelector(
+            abi.encodePacked(
                 IWithdrawPrecompile.withdrawBitcoinAssets.selector, address(0), normalizedValue, btcAddr
             )
         );
@@ -41,7 +41,7 @@ library SystemWithdraw {
 
     function withdrawErc20Token(address token, uint256 value, string calldata btcAddr) internal returns (uint256) {
         (bool success, bytes memory returnData) = precompile().call(
-            abi.encodeWithSelector(IWithdrawPrecompile.withdrawBitcoinAssets.selector, token, value, btcAddr)
+            abi.encodePacked(IWithdrawPrecompile.withdrawBitcoinAssets.selector, token, value, btcAddr)
         );
 
         require(success, string(returnData));
@@ -54,7 +54,7 @@ library SystemWithdraw {
 
     function withdrawGovToken(uint256 value, bytes32 substratePubkey) internal {
         (bool success, bytes memory returnData) = precompile().call(
-            abi.encodeWithSelector(IWithdrawPrecompile.withdrawGovToken.selector, value, substratePubkey)
+            abi.encodePacked(IWithdrawPrecompile.withdrawGovToken.selector, value, substratePubkey)
         );
 
         require(success, string(returnData));
@@ -62,7 +62,7 @@ library SystemWithdraw {
 
     function governanceToken() internal view returns (address) {
         (, bytes memory returnData) =
-            precompile().staticcall(abi.encodeWithSelector(IWithdrawPrecompile.queryGovToken.selector));
+            precompile().staticcall(abi.encodePacked(IWithdrawPrecompile.queryGovToken.selector));
         require(returnData.length == 32, "Invalid returnData");
 
         address govToken = abi.decode(returnData, (address));
@@ -73,7 +73,7 @@ library SystemWithdraw {
 
     function withdrawBitcoinFees() internal view returns (uint256, uint256, uint256) {
         (, bytes memory returnData) =
-            precompile().staticcall(abi.encodeWithSelector(IWithdrawPrecompile.queryCurrentFees.selector));
+            precompile().staticcall(abi.encodePacked(IWithdrawPrecompile.queryCurrentFees.selector));
         require(returnData.length == 96, "Invalid returnData");
 
         (uint256 withdrawBtcFee, uint256 withdrawBrc20Fee, uint256 withdrawRunesFee) =
@@ -89,7 +89,7 @@ library SystemWithdraw {
         require(normalizedValue > 0, "Normalized gas is zero");
 
         (bool success, bytes memory returnData) = precompile().call(
-            abi.encodeWithSelector(IWithdrawPrecompile.withdrawLightning.selector, sender, normalizedValue)
+            abi.encodePacked(IWithdrawPrecompile.withdrawLightning.selector, sender, normalizedValue)
         );
 
         require(success, string(returnData));
