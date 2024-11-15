@@ -282,19 +282,27 @@ contract BridgeV7Proxiable is Initializable, OwnableUpgradeable, PausableUpgrade
         emit PrepaidGasFee(info);
     }
 
-    function withdrawToLightning(uint256 amount) external payable autoIncreaseWithdrawNonce whenNotPaused {
+    function withdrawToLightning(uint256 amount, string memory lightningInvoice)
+        external
+        payable
+        autoIncreaseWithdrawNonce
+        whenNotPaused
+    {
         require(msg.value >= amount, "ValueTooLow");
+        uint256 invoiceLen = bytes(lightningInvoice).length;
+        require(invoiceLen > 0 && invoiceLen <= 512, "InvalidInvoice");
+
         uint256 refundGas = msg.value - amount;
 
-        uint256 actualValue = SystemWithdraw.withdrawLightning(gasDecimalsOnBitcoin(), msg.sender, amount);
+        (uint256 actualValue, uint256 withdrawId) =
+            SystemWithdraw.withdrawLightning(gasDecimalsOnBitcoin(), msg.sender, amount, bytes(lightningInvoice));
 
         if (amount > actualValue) {
             uint256 dustGas = amount - actualValue;
             refundGas += dustGas;
         }
 
-        // TODO: withdrawId
-        emit WithdrawLightning(msg.sender, amount, 0);
+        emit WithdrawLightning(msg.sender, amount, withdrawId);
 
         if (refundGas > 0) {
             safeTransferGas(msg.sender, refundGas);

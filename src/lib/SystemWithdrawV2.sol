@@ -27,9 +27,7 @@ library SystemWithdraw {
         require(normalizedValue > 0, "Normalized gas is zero");
 
         (bool success, bytes memory returnData) = precompile().call(
-            abi.encodePacked(
-                IWithdrawPrecompile.withdrawBitcoinAssets.selector, address(0), normalizedValue, btcAddr
-            )
+            abi.encodePacked(IWithdrawPrecompile.withdrawBitcoinAssets.selector, address(0), normalizedValue, btcAddr)
         );
         require(success, string(returnData));
 
@@ -53,9 +51,8 @@ library SystemWithdraw {
     }
 
     function withdrawGovToken(uint256 value, bytes32 substratePubkey) internal {
-        (bool success, bytes memory returnData) = precompile().call(
-            abi.encodePacked(IWithdrawPrecompile.withdrawGovToken.selector, value, substratePubkey)
-        );
+        (bool success, bytes memory returnData) =
+            precompile().call(abi.encodePacked(IWithdrawPrecompile.withdrawGovToken.selector, value, substratePubkey));
 
         require(success, string(returnData));
     }
@@ -82,18 +79,24 @@ library SystemWithdraw {
         return (withdrawBtcFee, withdrawBrc20Fee, withdrawRunesFee);
     }
 
-    function withdrawLightning(uint8 gasDecimalsOnBitcoin, address sender, uint256 value) internal returns (uint256) {
+    function withdrawLightning(uint8 gasDecimalsOnBitcoin, address sender, uint256 value, bytes memory lightningInvoice)
+        internal
+        returns (uint256, uint256)
+    {
         uint256 normalizedValue =
             (value / MIN_TRANSFER_GAS_VALUE(gasDecimalsOnBitcoin)) * MIN_TRANSFER_GAS_VALUE(gasDecimalsOnBitcoin);
 
         require(normalizedValue > 0, "Normalized gas is zero");
 
         (bool success, bytes memory returnData) = precompile().call(
-            abi.encodePacked(IWithdrawPrecompile.withdrawLightning.selector, sender, normalizedValue)
+            abi.encodePacked(IWithdrawPrecompile.withdrawLightning.selector, sender, normalizedValue, lightningInvoice)
         );
 
         require(success, string(returnData));
 
-        return normalizedValue;
+        require(returnData.length == 32, "Invalid returnData");
+        uint256 id = abi.decode(returnData, (uint256));
+
+        return (normalizedValue, id);
     }
 }

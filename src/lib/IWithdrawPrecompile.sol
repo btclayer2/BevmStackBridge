@@ -6,5 +6,5 @@ interface IWithdrawPrecompile {
     function withdrawGovToken(uint256, bytes32) external;
     function queryGovToken() external view returns (address);
     function queryCurrentFees() external view returns (uint64, uint64, uint64);
-    function withdrawLightning(address, uint256) external;
+    function withdrawLightning(address, uint256, bytes memory) external returns (uint256);
 }
