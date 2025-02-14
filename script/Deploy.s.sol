@@ -6,7 +6,7 @@ import {Script, console} from "forge-std/Script.sol";
 import {Upgrades} from "openzeppelin-foundry-upgrades/Upgrades.sol";
 
 import {InitialParameters} from "src/lib/Types.sol";
-import {BridgeV6Proxiable} from "src/BridgeV6Proxiable.sol";
+import {BridgeV7Proxiable} from "src/BridgeV7Proxiable.sol";
 
 // deployment script
 // forge script ./script/Deploy.s.sol --broadcast -vvvv --rpc-url <rpc-url>
@@ -62,21 +62,21 @@ contract DeployScript is Script {
         vm.startBroadcast(deployerPrivateKey);
 
         address bridgeUupsProxy = Upgrades.deployUUPSProxy(
-            "BridgeV6Proxiable.sol", abi.encodeCall(BridgeV6Proxiable.initialize, initialParameters)
+            "BridgeV7Proxiable.sol", abi.encodeCall(BridgeV7Proxiable.initialize, initialParameters)
         );
 
         vm.stopBroadcast();
 
-        address bridgeImplV6 = Upgrades.getImplementationAddress(bridgeUupsProxy);
+        address bridgeImplV7 = Upgrades.getImplementationAddress(bridgeUupsProxy);
 
         vm.writeLine(".env", "\n");
         string memory BridgeProxyPrefix = "BRIDGE_PROXY=";
         vm.writeLine(".env", string.concat(BridgeProxyPrefix, vm.toString(bridgeUupsProxy)));
 
         string memory BridgeImplPrefix = "BRIDGE_IMPL=";
-        vm.writeLine(".env", string.concat(BridgeImplPrefix, vm.toString(bridgeImplV6)));
+        vm.writeLine(".env", string.concat(BridgeImplPrefix, vm.toString(bridgeImplV7)));
 
         console.log("Bridge Proxy Address", address(bridgeUupsProxy));
-        console.log("Bridge Implementation Address", address(bridgeImplV6));
+        console.log("Bridge Implementation Address", address(bridgeImplV7));
     }
 }
