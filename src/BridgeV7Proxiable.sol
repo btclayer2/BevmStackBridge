@@ -155,6 +155,9 @@ contract BridgeV7Proxiable is Initializable, OwnableUpgradeable, PausableUpgrade
     /// @dev Assist with upgradable proxy
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
+    /// @dev Call while Upgrading
+    function reinitialize(string memory /*_network*/ ) public reinitializer(2) {}
+
     fallback() external payable {
         // protection against accidental submissions by calling non-existent function
         revert("NOT_SUPPORT_FALLBACK");

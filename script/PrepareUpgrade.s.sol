@@ -8,7 +8,7 @@ import {Options} from "openzeppelin-foundry-upgrades/Options.sol";
 
 import {IUpgradeableProxy} from "openzeppelin-foundry-upgrades/internal/interfaces/IUpgradeableProxy.sol";
 
-import {BridgeV7TestProxiable} from "src/BridgeV7TestProxiable.sol";
+import {BridgeV7Proxiable} from "src/BridgeV7Proxiable.sol";
 
 // prepare upgrade script
 // forge script PrepareUpgradeScript --broadcast -vvvv --rpc-url <rpc-url>
@@ -38,7 +38,7 @@ contract PrepareUpgradeScript is Script {
 
         Options memory opts;
         opts.unsafeSkipStorageCheck = true;
-        address newBridgeImpl = Upgrades.prepareUpgrade("BridgeV7TestProxiable.sol", opts);
+        address newBridgeImpl = Upgrades.prepareUpgrade("BridgeV7Proxiable.sol", opts);
 
         vm.stopBroadcast();
 
@@ -47,7 +47,7 @@ contract PrepareUpgradeScript is Script {
         console.log("New Bridge Implementation Address", address(newBridgeImpl));
 
         // reinitializeCallData = $(cast calldata "reinitialize(string)" $memo)
-        bytes memory reinitializeCallData = abi.encodeCall(BridgeV7TestProxiable.reinitialize, memo);
+        bytes memory reinitializeCallData = abi.encodeCall(BridgeV7Proxiable.reinitialize, memo);
         console.log("Reinitialize Call Data:");
         console.logBytes(reinitializeCallData);
 
