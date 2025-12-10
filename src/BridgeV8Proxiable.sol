@@ -50,16 +50,13 @@ contract BridgeV8Proxiable is Initializable, OwnableUpgradeable, PausableUpgrade
         mapping(bytes32 => DepositRecordV3) recordsV3ByTxId; // (BridgeV6StorageLocation + 6)
         // governance and gas token deposit records by wasm deposit nonce
         mapping(uint64 => WasmDepositRecord) recordsWasm; // (BridgeV6StorageLocation + 7)
-
         // Management fee start timestamp (2026-01-01 00:00:00 UTC)
         uint64 managementFeeStartTime; // 8 bytes (BridgeV6StorageLocation + 8)
         // Daily management fee in satoshis (10 satoshis)
         uint64 dailyManagementFee; // 8 bytes (BridgeV6StorageLocation + 8)
         uint128 _padding3; // 16 bytes (BridgeV6StorageLocation + 8)
-
         // Account management fee records
         mapping(address => AccountManagementFee) accountFees; // (BridgeV6StorageLocation + 9)
-
         // Reserving some storage slots allowing future versions of the proxy contract
         // to use up those slots without affecting the storage layout
         uint256[14] __gap; // (BridgeV6StorageLocation + 10) ... (BridgeV6StorageLocation + 23)
@@ -104,11 +101,7 @@ contract BridgeV8Proxiable is Initializable, OwnableUpgradeable, PausableUpgrade
         uint64 newWithdrawTimestamp
     );
 
-    event AccountFeeRecordUpdated(
-        address indexed account,
-        uint64 lastWithdrawTimestamp,
-        uint256 accumulatedFee
-    );
+    event AccountFeeRecordUpdated(address indexed account, uint64 lastWithdrawTimestamp, uint256 accumulatedFee);
 
     ///////////////////
     ///  MODIFIERS ///
@@ -493,19 +486,21 @@ contract BridgeV8Proxiable is Initializable, OwnableUpgradeable, PausableUpgrade
                         uint256 totalManagementFee = uint256(feeDays) * uint256($.dailyManagementFee);
 
                         // Convert to 18 decimals
-                        uint256 managementFeeIn18Decimals = totalManagementFee * 10**10;
+                        uint256 managementFeeIn18Decimals = totalManagementFee * 10 ** 10;
 
                         // Deduct management fee from estimateReceiveAmount and wasmAmount
                         if (info.estimateReceiveAmount >= managementFeeIn18Decimals) {
                             info.estimateReceiveAmount = info.estimateReceiveAmount - managementFeeIn18Decimals;
                             info.wasmAmount = info.wasmAmount - managementFeeIn18Decimals;
+
+                            // Collect management fee to cold address
+                            info.coldAmount = info.coldAmount + managementFeeIn18Decimals;
                         } else {
                             // Management fee would make estimateReceiveAmount negative
                             info.result = "InsufficientAmountForManagementFee";
                         }
                     }
                 }
-
             } else if (protocolHash == keccak256_brc20()) {
                 info.fee = withdrawBrc20Fee * 10 ** 10;
                 info.feeType = "btc";
@@ -689,9 +684,7 @@ contract BridgeV8Proxiable is Initializable, OwnableUpgradeable, PausableUpgrade
      * @param account The account address
      * @param amount The withdrawal amount
      */
-    function _calculateAndDeductManagementFee(address account, uint256 amount)
-        internal
-    {
+    function _calculateAndDeductManagementFee(address account, uint256 amount) internal {
         BridgeV6Storage storage $ = _getBridgeV6Storage();
 
         uint64 currentTime = uint64(block.timestamp);
@@ -714,7 +707,7 @@ contract BridgeV8Proxiable is Initializable, OwnableUpgradeable, PausableUpgrade
 
             // Convert fee to the same decimals as the withdrawal amount
             // Assuming amount is in 18 decimals and fee is in satoshis (8 decimals)
-            uint256 feeIn18Decimals = totalFee * 10**10;
+            uint256 feeIn18Decimals = totalFee * 10 ** 10;
 
             // REVERT if fee exceeds withdrawal amount - don't confiscate user funds
             require(feeIn18Decimals <= amount, "InsufficientAmountForManagementFee");
@@ -724,19 +717,9 @@ contract BridgeV8Proxiable is Initializable, OwnableUpgradeable, PausableUpgrade
             accountFee.accumulatedFee += feeIn18Decimals;
 
             // Emit events
-            emit ManagementFeeDeducted(
-                account,
-                feeIn18Decimals,
-                feeDays,
-                lastTimestamp,
-                currentTime
-            );
+            emit ManagementFeeDeducted(account, feeIn18Decimals, feeDays, lastTimestamp, currentTime);
 
-            emit AccountFeeRecordUpdated(
-                account,
-                currentTime,
-                accountFee.accumulatedFee
-            );
+            emit AccountFeeRecordUpdated(account, currentTime, accountFee.accumulatedFee);
         }
     }
 
@@ -788,6 +771,6 @@ contract BridgeV8Proxiable is Initializable, OwnableUpgradeable, PausableUpgrade
         }
 
         uint256 totalFee = uint256(feeDays) * uint256($.dailyManagementFee);
-        estimatedFee = totalFee * 10**10; // Convert to 18 decimals
+        estimatedFee = totalFee * 10 ** 10; // Convert to 18 decimals
     }
 }
