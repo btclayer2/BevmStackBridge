@@ -64,3 +64,11 @@ struct InitialParameters {
     uint64 wasmDepositNonce; // 8 bytes
     string gasType; // string
 }
+
+// BridgeV7 - Account Management Fee
+struct AccountManagementFee {
+    // Last withdrawal timestamp
+    uint64 lastWithdrawTimestamp;
+    // Total accumulated fee in satoshis
+    uint256 accumulatedFee;
+}
