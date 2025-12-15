@@ -424,6 +424,10 @@ contract BridgeV8Proxiable is Initializable, OwnableUpgradeable, PausableUpgrade
         return $.recordsWasm[nonce];
     }
 
+    function getInitializedVersion() public view returns (uint64) {
+        return _getInitializedVersion();
+    }
+
     function prepaidGasFee(address token, uint256 amount) public view returns (PrepaidGasFeeInfo memory) {
         PrepaidGasFeeInfo memory info;
         info.token = token;
