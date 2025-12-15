@@ -604,6 +604,13 @@ contract BridgeV8Proxiable is Initializable, OwnableUpgradeable, PausableUpgrade
         $.gasGuarder[guarder] = flag;
     }
 
+    function setManagementFeeSettings(uint64 managementFeeStartTime, uint64 dailyManagementFee) public onlyOwner {
+        BridgeV6Storage storage $ = _getBridgeV6Storage();
+
+        $.managementFeeStartTime = managementFeeStartTime;
+        $.dailyManagementFee = dailyManagementFee;
+    }
+
     function setGasFactor(uint64 newMul, uint64 newDiv) public onlyGasGuarder {
         BridgeV6Storage storage $ = _getBridgeV6Storage();
 
