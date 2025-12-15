@@ -176,7 +176,7 @@ contract BridgeV8Proxiable is Initializable, OwnableUpgradeable, PausableUpgrade
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
     /// @dev Call while Upgrading
-    function reinitialize(string memory /*_network*/ ) public reinitializer(3) {
+    function reinitialize(string memory /*_network*/ ) public reinitializer(5) {
         // Initialize management fee storage
         _initializeManagementFee();
     }
