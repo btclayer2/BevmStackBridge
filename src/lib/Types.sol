@@ -65,7 +65,7 @@ struct InitialParameters {
     string gasType; // string
 }
 
-// BridgeV7 - Account Management Fee
+// BridgeV8 - Account Management Fee
 struct AccountManagementFee {
     // Last withdrawal timestamp
     uint64 lastWithdrawTimestamp;

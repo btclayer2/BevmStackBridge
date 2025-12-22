@@ -59,7 +59,7 @@ Based on the execution results of the previous step,
 **verify the contracts**
 ```bash
 source .env
-forge verify-contract --verifier blockscout  --verifier-url $VERIFIER_URL $NEW_BRIDGE_IMPL  src/BridgeV7TestProxiable.sol:BridgeV7TestProxiable --chain $CHAIN_ID
+forge verify-contract --verifier blockscout  --verifier-url $VERIFIER_URL $NEW_BRIDGE_IMPL  src/BridgeV9Proxiable.sol:BridgeV9Proxiable --chain $CHAIN_ID --watch
 ```
 
 ## Troubleshooting
